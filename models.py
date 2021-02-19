@@ -26,8 +26,8 @@ class DoneeModel(db.Model):
 
 class DonationModel(db.Model):
     __tablename__ = 'donations'
-    userName = db.Column(db.String(30), ForeignKey('users.name'), primary_key=True)
-    doneeID = db.Column(db.String(20), ForeignKey('donees.id'), primary_key=True)
+    user_name = db.Column(db.String(30), ForeignKey('users.name'), primary_key=True)
+    donee_id = db.Column(db.String(20), ForeignKey('donees.id'), primary_key=True)
     date = db.Column(db.DateTime, primary_key=True)
     type = db.Column(db.String(30), nullable=False)
-    valueEstimation = db.Column(db.Integer, nullable=False)
+    value = db.Column(db.Integer, nullable=False)
