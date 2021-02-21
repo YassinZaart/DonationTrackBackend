@@ -14,6 +14,9 @@ class UserInfoSchema(UserEmailSchema):
     city = fields.Str(required=True, error_messages={"required": "City is required"})
     street = fields.Str(required=True, error_messages={"required": "Street is required"})
     name = fields.Str(required=True, error_messages={"required": "Name is required"})
+
+
+class SignUpInfoSchema(UserInfoSchema):
     password = fields.Str(required=True, error_messages={"required": "Password is required"})
 
 

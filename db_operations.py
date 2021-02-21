@@ -1,5 +1,5 @@
 import models
-from envVariables import db
+from variables import db
 import states
 
 
@@ -22,8 +22,8 @@ def signup(email, name, password, city, street, phone_number):
     if user is not None:
         return states.SignupState.NAME_ALREADY_EXIST
 
-    user = models.UserModel(email=email, name=name, phoneNumber=phone_number,
-                            city=city, street=street, password=password, isAdmin=False)
+    user = models.UserModel(email=email, name=name, phone_number=phone_number,
+                            city=city, street=street, password=password, is_admin=False)
     db.session.add(user)
     db.session.commit()
     return states.SignupState.SIGNUP_SUCCESSFUL
@@ -43,8 +43,8 @@ def insert_donee(id, fname, lname, city, street, phone_number):
     donee = models.UserModel.query.filter_by(id=id).first()
     if donee is None:
         return states.DoneeInsertionState.DONEE_EXISTS
-    donee = models.DoneeModel(id=id, fname=fname, lname=lname, city=city,
-                              street=street, phoneNumber=phone_number)
+    donee = models.DoneeModel(id=id, first_name=fname, last_name=lname, city=city,
+                              street=street, phone_number=phone_number)
     db.session.add(donee)
     db.session.commit()
     return states.DoneeInsertionState.INSERTION_SUCCESSFUL
