@@ -14,9 +14,9 @@ class User(Resource):
     def get(self):
         args = request.args
         try:
-            schemas.UserEmailSchema.load(args)
+            schemas.UserEmailSchema().load(args)
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
         user = db_operations.get_user(args["email"])
         if user is None:
             abort(message="User not found", http_status_code=404)
@@ -30,7 +30,7 @@ class SignUp(Resource):
         try:
             schemas.SignUpInfoSchema().load(args)
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
         state = db_operations.signup(args["email"], args["name"],
                                      args["password"], args["city"],
                                      args["street"], args["phone_number"])
@@ -47,7 +47,7 @@ class Login(Resource):
         try:
             schemas.LoginSchema().load(args)
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
 
         state = db_operations.login(args["email"], args["password"])
         if state == states.LoginState.INCORRECT_PASSWORD:
@@ -55,7 +55,7 @@ class Login(Resource):
             return message, 409
         if state == states.LoginState.USER_NOT_FOUND:
             message = {'message': 'User does not exist'}
-            return 404
+            return message, 404
         return 200
 
 
@@ -79,11 +79,11 @@ class Donee(Resource):
         try:
             schemas.DoneeIDSchema().load(args)
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
         donee = db_operations.get_donee(args["id"])
         if donee is None:
             abort(message="Invalid ID", http_status_code=404)
-        return args
+        return donee
 
 
 class Donation(Resource):
@@ -92,7 +92,7 @@ class Donation(Resource):
         try:
             schemas.DonationSchema().load(args)
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
         state = db_operations.insert_donation(args["id"], args["name"],
                                               args["date"], args["type"],
                                               args["value"])
@@ -110,7 +110,7 @@ class Donation(Resource):
         try:
             schemas.UserNameSchema().load(args["name"])
         except ValidationError as err:
-            return err.messages, 409
+            abort(message=err.messages, http_status_code=409)
         donations = db_operations.get_donations_by_user(args["name"])
         if donations is None:
             abort(message="Donation not found", http_status_code=404)

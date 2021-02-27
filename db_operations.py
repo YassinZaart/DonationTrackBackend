@@ -35,7 +35,7 @@ def get_donee(id):
 
 
 def insert_donee(id, fname, lname, city, street, phone_number):
-    donee = models.DoneeModel.get(id)
+    donee = models.DoneeModel.query.get(id)
     if donee is not None:
         return states.DoneeInsertionState.DONEE_EXISTS
     donee = models.DoneeModel(id=id, first_name=fname, last_name=lname, city=city,
