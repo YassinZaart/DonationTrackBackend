@@ -1,5 +1,5 @@
 import models
-from variables import db
+from variables import db, bcrypt
 import states
 
 
@@ -7,7 +7,7 @@ def login(email, password):
     user = models.UserModel.query.get(email)
     if user is None:
         return states.LoginState.USER_NOT_FOUND
-    if user.password == password:
+    if bcrypt.check_password_hash(user.password, password):
         return states.LoginState.LOGIN_SUCCESSFUL
     else:
         return states.LoginState.INCORRECT_PASSWORD
@@ -15,10 +15,11 @@ def login(email, password):
 
 def signup(email, name, password, city, street, phone_number):
     user = models.UserModel.query.get(email)
+    pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     if user is not None:
         return states.SignupState.EMAIL_ALREADY_EXIST
     user = models.UserModel(email=email, name=name, phone_number=phone_number,
-                            city=city, street=street, password=password, is_admin=False)
+                            city=city, street=street, password=pw_hash, is_admin=False)
     db.session.add(user)
     db.session.commit()
     return states.SignupState.SIGNUP_SUCCESSFUL
