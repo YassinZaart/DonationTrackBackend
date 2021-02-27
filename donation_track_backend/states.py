@@ -17,6 +17,7 @@ class DoneeInsertionState(Enum):
     DONEE_EXISTS = auto()
     INSERTION_SUCCESSFUL = auto()
 
+
 class DonationInsertionState(Enum):
     USER_DOESNT_EXIST = auto()
     DONEE_DOESNT_EXIST = auto()

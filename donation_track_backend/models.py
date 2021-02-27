@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey
 
-from variables import db
+from donation_track_backend.variables import db
 
 
 class UserModel(db.Model):

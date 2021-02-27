@@ -1,11 +1,8 @@
 from flask_restful import Resource, request, marshal_with, abort
 from marshmallow import ValidationError
 
-from variables import api
-import schemas
-import db_operations
-import states
-import resource_fields
+from donation_track_backend.variables import api
+from donation_track_backend import db_operations, schemas, states, resource_fields
 
 
 class User(Resource):

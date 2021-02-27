@@ -1,6 +1,5 @@
-import models
-from variables import db, bcrypt
-import states
+from donation_track_backend.variables import db, bcrypt
+from donation_track_backend import states, models
 
 
 def login(email, password):
