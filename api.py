@@ -1,4 +1,6 @@
-from flask_restful import Resource, request, marshal_with
+from flask_restful import Resource, request, marshal_with, abort
+from marshmallow import ValidationError
+
 from variables import api
 import schemas
 import db_operations
@@ -11,7 +13,13 @@ class User(Resource):
     @marshal_with(resource_fields.user_resource_fields)
     def get(self):
         args = request.args
-        user = db_operations.get_user(args["name"])
+        try:
+            schemas.UserEmailSchema.load(args)
+        except ValidationError as err:
+            return err.messages, 409
+        user = db_operations.get_user(args["email"])
+        if user is None:
+            abort(message="User not found", http_status_code=404)
         return user
 
 
@@ -19,12 +27,14 @@ class SignUp(Resource):
 
     def post(self):
         args = request.args
-        schema = schemas.SignUpInfoSchema.load(args)
+        try:
+            schemas.SignUpInfoSchema().load(args)
+        except ValidationError as err:
+            return err.messages, 409
         state = db_operations.signup(args["email"], args["name"],
                                      args["password"], args["city"],
-                                     args["street"], args["phoneNumber"])
-        if (state == states.SignupState.NAME_ALREADY_EXIST) \
-                or (state == states.SignupState.EMAIL_ALREADY_EXIST):
+                                     args["street"], args["phone_number"])
+        if state == states.SignupState.EMAIL_ALREADY_EXIST:
             message = {'message': 'User already exist'}
             return message, 409
 
@@ -34,7 +44,11 @@ class SignUp(Resource):
 class Login(Resource):
     def post(self):
         args = request.args
-        schemas.LoginSchema().load(args)
+        try:
+            schemas.LoginSchema().load(args)
+        except ValidationError as err:
+            return err.messages, 409
+
         state = db_operations.login(args["email"], args["password"])
         if state == states.LoginState.INCORRECT_PASSWORD:
             message = {'message': 'Incorrect password'}
@@ -48,8 +62,11 @@ class Login(Resource):
 class Donee(Resource):
     def post(self):
         args = request.args
-        schemas.DoneeSchema().load(args)
-        state = db_operations.insert_donee(args["id"], args["fname"], args["lname"],
+        try:
+            schemas.DoneeSchema().load(args)
+        except ValidationError as err:
+            return err.messages, 409
+        state = db_operations.insert_donee(args["id"], args["first_name"], args["last_name"],
                                            args["city"], args["street"], args["phone_number"])
         if state == states.DoneeInsertionState.DONEE_EXISTS:
             message = {'message': 'Donee already exist'}
@@ -59,18 +76,24 @@ class Donee(Resource):
     @marshal_with(resource_fields.donee_resource_fields)
     def get(self):
         args = request.args
-        schemas.DoneeIDSchema.load(args)
+        try:
+            schemas.DoneeIDSchema().load(args)
+        except ValidationError as err:
+            return err.messages, 409
         donee = db_operations.get_donee(args["id"])
         if donee is None:
             message = {'message': 'Invalid ID'}
-            return 404
+            return message, 404
         return args
 
 
 class Donation(Resource):
     def post(self):
         args = request.args
-        schemas.DonationSchema.load(args)
+        try:
+            schemas.DonationSchema().load(args)
+        except ValidationError as err:
+            return err.messages, 409
         state = db_operations.insert_donation(args["id"], args["name"],
                                               args["date"], args["type"],
                                               args["value"])
@@ -85,6 +108,11 @@ class Donation(Resource):
     @marshal_with(resource_fields.donation_resource_fields)
     def get(self):
         args = request.args
+        try:
+            schemas.UserNameSchema().load(args["name"])
+        except ValidationError as err:
+            return err.messages, 409
+
         donations = db_operations.get_donations_by_user(args["name"])
         return donations
 

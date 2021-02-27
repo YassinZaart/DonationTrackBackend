@@ -8,6 +8,8 @@ class UserEmailSchema(Schema):
 class LoginSchema(UserEmailSchema):
     password = fields.Str(required=True, error_messages={"required": "Password is required"})
 
+class UserNameSchema(Schema):
+    name = fields.Str(required=True, error_messages={"required": "Name is required"})
 
 class UserInfoSchema(UserEmailSchema):
     phone_number = fields.Str(required=True, error_messages={"required": "Phone number is required"})
@@ -22,7 +24,6 @@ class SignUpInfoSchema(UserInfoSchema):
 
 class DoneeIDSchema(Schema):
     id = fields.Int(required=True, error_messages={"required": "ID is required"})
-
 
 class DoneeSchema(DoneeIDSchema):
     phone_number = fields.Str(required=True, error_messages={"required": "Phone number is required"})
