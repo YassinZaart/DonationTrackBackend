@@ -4,7 +4,7 @@ import states
 
 
 def login(email, password):
-    user = models.UserModel.query.filter_by(email=email).first()
+    user = models.UserModel.query.get(email)
     if user is None:
         return states.LoginState.USER_NOT_FOUND
     if user.password == password:
@@ -14,14 +14,9 @@ def login(email, password):
 
 
 def signup(email, name, password, city, street, phone_number):
-    user = models.UserModel.query.filter_by(email=email).first()
+    user = models.UserModel.query.get(email)
     if user is not None:
         return states.SignupState.EMAIL_ALREADY_EXIST
-
-    user = models.UserModel.query.filter_by(name=name).first()
-    if user is not None:
-        return states.SignupState.NAME_ALREADY_EXIST
-
     user = models.UserModel(email=email, name=name, phone_number=phone_number,
                             city=city, street=street, password=password, is_admin=False)
     db.session.add(user)
@@ -29,19 +24,19 @@ def signup(email, name, password, city, street, phone_number):
     return states.SignupState.SIGNUP_SUCCESSFUL
 
 
-def get_user(name):
-    user = models.UserModel.query.filter_by(name=name).all()
+def get_user(email):
+    user = models.UserModel.query.get(email)
     return user
 
 
 def get_donee(id):
-    user = models.DoneeModel.query.filter_by(id=id).first()
+    user = models.DoneeModel.query.get(id)
     return user
 
 
 def insert_donee(id, fname, lname, city, street, phone_number):
-    donee = models.UserModel.query.filter_by(id=id).first()
-    if donee is None:
+    donee = models.DoneeModel.get(id)
+    if donee is not None:
         return states.DoneeInsertionState.DONEE_EXISTS
     donee = models.DoneeModel(id=id, first_name=fname, last_name=lname, city=city,
                               street=street, phone_number=phone_number)
