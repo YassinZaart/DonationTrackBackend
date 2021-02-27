@@ -82,8 +82,7 @@ class Donee(Resource):
             return err.messages, 409
         donee = db_operations.get_donee(args["id"])
         if donee is None:
-            message = {'message': 'Invalid ID'}
-            return message, 404
+            abort(message="Invalid ID", http_status_code=404)
         return args
 
 
@@ -112,8 +111,9 @@ class Donation(Resource):
             schemas.UserNameSchema().load(args["name"])
         except ValidationError as err:
             return err.messages, 409
-
         donations = db_operations.get_donations_by_user(args["name"])
+        if donations is None:
+            abort(message="Donation not found", http_status_code=404)
         return donations
 
 
