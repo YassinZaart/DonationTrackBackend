@@ -2,7 +2,7 @@ from donation_track_backend.variables import db, bcrypt
 from donation_track_backend import states, models
 
 
-def login(email, password):
+def login(email, password) -> states.LoginState:
     user = models.UserModel.query.get(email)
     if user is None:
         return states.LoginState.USER_NOT_FOUND
@@ -12,7 +12,7 @@ def login(email, password):
         return states.LoginState.INCORRECT_PASSWORD
 
 
-def signup(email, name, password, city, street, phone_number):
+def signup(email, name, password, city, street, phone_number) -> states.SignupState:
     user = models.UserModel.query.get(email)
     pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     if user is not None:
@@ -24,17 +24,17 @@ def signup(email, name, password, city, street, phone_number):
     return states.SignupState.SIGNUP_SUCCESSFUL
 
 
-def get_user(email):
+def get_user(email) -> models.UserModel:
     user = models.UserModel.query.get(email)
     return user
 
 
-def get_donee(id):
+def get_donee(id) -> models.DoneeModel:
     user = models.DoneeModel.query.get(id)
     return user
 
 
-def insert_donee(id, fname, lname, city, street, phone_number):
+def insert_donee(id, fname, lname, city, street, phone_number) -> states.DoneeInsertionState:
     donee = models.DoneeModel.query.get(id)
     if donee is not None:
         return states.DoneeInsertionState.DONEE_EXISTS
@@ -45,17 +45,17 @@ def insert_donee(id, fname, lname, city, street, phone_number):
     return states.DoneeInsertionState.INSERTION_SUCCESSFUL
 
 
-def get_donations_by_donee(id):
+def get_donations_by_donee(id) -> models.DonationModel:
     donations = models.DonationModel.query.filter_by(id=id).all()
     return donations
 
 
-def get_donations_by_user(name):
+def get_donations_by_user(name) -> models.DoneeModel:
     donations = models.DonationModel.query.filter_by(name=name).all()
     return donations
 
 
-def insert_donation(id, name, date_time, type, value):
+def insert_donation(id, name, date_time, type, value) -> states.DonationInsertionState:
     donation = models.UserModel.query.filter_by(id=id).first()
     if donation is None:
         return states.DonationInsertionState.DONEE_DOESNT_EXIST
