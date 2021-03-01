@@ -1,8 +1,10 @@
+from sqlalchemy import DateTime
+
 from donation_track_backend.variables import db, bcrypt
 from donation_track_backend import states, models
 
 
-def login(email, password) -> states.LoginState:
+def login(email: str, password: str) -> states.LoginState:
     user = models.UserModel.query.get(email)
     if user is None:
         return states.LoginState.USER_NOT_FOUND
@@ -12,7 +14,7 @@ def login(email, password) -> states.LoginState:
         return states.LoginState.INCORRECT_PASSWORD
 
 
-def signup(email, name, password, city, street, phone_number) -> states.SignupState:
+def signup(email: str, name: str, password: str, city: str, street: str, phone_number: str) -> states.SignupState:
     user = models.UserModel.query.get(email)
     pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     if user is not None:
@@ -24,17 +26,18 @@ def signup(email, name, password, city, street, phone_number) -> states.SignupSt
     return states.SignupState.SIGNUP_SUCCESSFUL
 
 
-def get_user(email) -> models.UserModel:
+def get_user(email: str) -> models.UserModel:
     user = models.UserModel.query.get(email)
     return user
 
 
-def get_donee(id) -> models.DoneeModel:
+def get_donee(id: str) -> models.DoneeModel:
     user = models.DoneeModel.query.get(id)
     return user
 
 
-def insert_donee(id, fname, lname, city, street, phone_number) -> states.DoneeInsertionState:
+def insert_donee(id: str, fname: str, lname: str, city: str, street: str,
+                 phone_number: str) -> states.DoneeInsertionState:
     donee = models.DoneeModel.query.get(id)
     if donee is not None:
         return states.DoneeInsertionState.DONEE_EXISTS
@@ -45,25 +48,31 @@ def insert_donee(id, fname, lname, city, street, phone_number) -> states.DoneeIn
     return states.DoneeInsertionState.INSERTION_SUCCESSFUL
 
 
-def get_donations_by_donee(id) -> models.DonationModel:
+def get_donations_by_donee(id: str) -> models.DonationModel:
     donations = models.DonationModel.query.filter_by(id=id).all()
     return donations
 
 
-def get_donations_by_user(name) -> models.DoneeModel:
-    donations = models.DonationModel.query.filter_by(name=name).all()
+def get_donations_by_user(name: str) -> models.DonationModel:
+    donations = models.DonationModel.query.filter_by(user_name=name).all()
     return donations
 
 
-def insert_donation(id, name, date_time, type, value) -> states.DonationInsertionState:
-    donation = models.UserModel.query.filter_by(id=id).first()
+def get_donations_by_donee(id: str) -> models.DoneeModel:
+    donations = models.DonationModel.query.filter_by(donee_id=id).all()
+    return donations
+
+
+def insert_donation(donee_id: str, user_name: str, date_time: DateTime, type: str,
+                    value: str) -> states.DonationInsertionState:
+    donation = models.DonationModel.query.filter_by(donee_id=donee_id).first()
     if donation is None:
         return states.DonationInsertionState.DONEE_DOESNT_EXIST
-    donation = models.UserModel.query.filter_by(name=name).first()
+    donation = models.DonationModel.query.filter_by(user_name=user_name).first()
     if donation is None:
         return states.DonationInsertionState.USER_DOESNT_EXIST
-    donation = models.DoneeModel(id=id, name=name, date=date_time,
-                                 type=type, value=value)
+    donation = models.DonationModel(donee_id=donee_id, user_name=user_name, date=date_time,
+                                    type=type, value=value)
     db.session.add(donation)
     db.session.commit()
     return states.DonationInsertionState.INSERTION_SUCCESSFUL
