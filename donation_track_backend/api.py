@@ -107,15 +107,17 @@ class Donation(Resource):
         if "donee_id" in args:
             donations = db_operations.get_donations_by_donee(args["donee_id"])
             if donations is None:
-                abort(message="Donation not found", http_status_code=404)
+                abort(message="Donation not found", http_status_code=409)
             return donations
 
         if "user_name" in args:
             donations = db_operations.get_donations_by_user(args["user_name"])
             if donations is None:
-                abort(message="Donation not found", http_status_code=404)
+                abort(message="Donation not found", http_status_code=409)
             return donations
-        abort(message="donee_id or user_name arguments are missing", http_status_code=404)
+        if "user_name" in args & "donee_id" in args:
+            abort(message="donee_id and user_name can't be in the same request", http_status_code=409)
+        abort(message="donee_id or user_name arguments are missing", http_status_code=400)
 
 
 api.add_resource(User, "/users")
