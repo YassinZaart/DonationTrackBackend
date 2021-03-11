@@ -34,8 +34,8 @@ class DoneeSchema(DoneeIDSchema):
 
 
 class DonationSchema(Schema):
-    donee_id = fields.Int(required=True, error_messages={"required": "ID is required"})
-    user_name = fields.Str(required=True, error_messages={"required": "User name is required"})
+    id = fields.Int(required=True, error_messages={"required": "ID is required"})
+    name = fields.Str(required=True, error_messages={"required": "User name is required"})
     date = fields.DateTime(required=True, error_messages={"required": "Date is required"})
     type = fields.Str(required=True, error_messages={"required": "Type is required"})
     value = fields.Int(required=True, error_messages={"required": "Value is required"})

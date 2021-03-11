@@ -90,7 +90,7 @@ class Donation(Resource):
             schemas.DonationSchema().load(args)
         except ValidationError as err:
             abort(message=err.messages, http_status_code=409)
-        state = db_operations.insert_donation(args["donee_id"], args["user_name"],
+        state = db_operations.insert_donation(args["id"], args["name"],
                                               args["date"], args["type"],
                                               args["value"])
         if state == states.DonationInsertionState.USER_DOESNT_EXIST:
@@ -104,20 +104,14 @@ class Donation(Resource):
     @marshal_with(resource_fields.donation_resource_fields)
     def get(self):
         args = request.args
-        if "donee_id" in args:
-            donations = db_operations.get_donations_by_donee(args["donee_id"])
-            if donations is None:
-                abort(message="Donation not found", http_status_code=409)
-            return donations
-
-        if "user_name" in args:
-            donations = db_operations.get_donations_by_user(args["user_name"])
-            if donations is None:
-                abort(message="Donation not found", http_status_code=409)
-            return donations
-        if "user_name" in args & "donee_id" in args:
-            abort(message="donee_id and user_name can't be in the same request", http_status_code=409)
-        abort(message="donee_id or user_name arguments are missing", http_status_code=400)
+        try:
+            schemas.UserNameSchema().load(args["name"])
+        except ValidationError as err:
+            abort(message=err.messages, http_status_code=409)
+        donations = db_operations.get_donations_by_user(args["name"])
+        if donations is None:
+            abort(message="Donation not found", http_status_code=404)
+        return donations
 
 
 api.add_resource(User, "/users")
