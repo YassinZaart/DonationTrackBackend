@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy import DateTime
 
 from donation_track_backend.variables import db, bcrypt
@@ -26,12 +28,12 @@ def signup(email: str, name: str, password: str, city: str, street: str, phone_n
     return states.SignupState.SIGNUP_SUCCESSFUL
 
 
-def get_user(email: str) -> models.UserModel:
+def get_user(email: str) -> Optional[models.UserModel]:
     user = models.UserModel.query.get(email)
     return user
 
 
-def get_donee(id: str) -> models.DoneeModel:
+def get_donee(id: str) -> Optional[models.DoneeModel]:
     user = models.DoneeModel.query.get(id)
     return user
 
@@ -48,17 +50,17 @@ def insert_donee(id: str, fname: str, lname: str, city: str, street: str,
     return states.DoneeInsertionState.INSERTION_SUCCESSFUL
 
 
-def get_donations_by_donee(id: str) -> models.DonationModel:
+def get_donations_by_donee(id: str) -> List[models.DonationModel]:
     donations = models.DonationModel.query.filter_by(id=id).all()
     return donations
 
 
-def get_donations_by_user(name: str) -> models.DonationModel:
+def get_donations_by_user(name: str) -> List[models.DonationModel]:
     donations = models.DonationModel.query.filter_by(user_name=name).all()
     return donations
 
 
-def get_donations_by_donee(id: str) -> models.DoneeModel:
+def get_donations_by_donee(id: str) -> List[models.DoneeModel]:
     donations = models.DonationModel.query.filter_by(donee_id=id).all()
     return donations
 
